@@ -1,36 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 function App() {
+  const inputRef = useRef();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
-  const [mes, setMes] = useState(false);
+  const [checkUser, setChecUser] = useState(false);
   const [error, setError] = useState("");
   const ChangeHandler = (e) => {
-    e.preventDefault();
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
   const submitHandler = (e) => {
     e.preventDefault();
     if (formData.username === "user" && formData.password === "password") {
-      setMes(true);
-      setError("Welcome User");
+      setChecUser(true);
+      setError("Welcome, user");
     } else {
-      setMes(false);
-      setError("Invalid Password and username");
+      setChecUser(false);
+      setError("Invalid username or password");
     }
   };
+  useEffect(()=>{
+    if(inputRef.current){
+      inputRef.current.focus();
+    }
+  },[])
   return (
     <div className="App">
       <h2>Login Page</h2>
-      <p>{error ? error : ""}</p>
+      <p className={checkUser ? "messageSucc" : "messageError"}>
+        {error}
+      </p>
       <form onSubmit={submitHandler}>
-        <label>Username:</label>
+        <label htmlFor="username">Username:</label>
         <input
           type="text"
           name="username"
@@ -38,11 +42,12 @@ function App() {
           placeholder="Username"
           required
           onChange={ChangeHandler}
+          ref={inputRef}
         />
         <br />
-        <label>Password:</label>
+        <label htmlFor="password">Password: </label>
         <input
-          type="text"
+          type="password"
           name="password"
           id="password"
           placeholder="Password"
